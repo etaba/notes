@@ -1,0 +1,67 @@
+#!/usr/bin/env python
+import requests
+import sys
+from datetime import datetime
+from bs4 import BeautifulSoup
+import os
+from urllib.request import (
+    urlopen, urlparse, urlunparse, urlretrieve)
+
+def write_error(message):
+    with open('errors.log','a') as f:
+        timestamp = datetime.now()
+        f.write(f"{timestamp} : {message}\n")
+
+
+def get_asset(domain,asset):
+    response = requests.get(domain + asset)
+    with open(asset,'w+') as f:
+        f.write(response.text)
+
+def save_site(url, out_folder):
+    name = url.replace('/','_')
+    try:
+        response = requests.get(url, allow_redirects=False)
+        if 200 <= response.status_code < 300:
+            soup = BeautifulSoup(response.text, 'html.parser')
+            # anchors = soup.findAll('a', href=True)
+            # link_count = len(anchors)
+            # images = soup.findAll('img')
+            # image_count = len(images)
+            # print(f"found {link_count} links and {image_count} images on {url} at {datetime.now()}")
+            parsed = list(urlparse(url))
+            links = soup.findAll('link')
+            for link in links:
+                if link['rel'] == 'stylesheet':
+                    get_asset(url, link['href'])
+            for image in images:
+                print("Image: %(src)s" % image)
+                filename = image["src"].split("/")[-1]
+                parsed[2] = image["src"]
+                outpath = os.path.join(out_folder, filename)
+                if image["src"].lower().startswith("http"):
+                    urlretrieve(image["src"], outpath)
+        else:
+            urlretrieve(urlunparse(parsed), outpath)
+            with open(f"{name}.txt",'w+') as f:
+                f.write(response.text)
+            msg = f"Could not reach {url}. Status code: {response.status_code}"
+            print(msg)
+            write_error(msg)
+    except requests.exceptions.SSLError as e:
+        msg = f"SSL Exception while requesting {url} \n Message:{e}"
+        write_error(msg)
+        print(msg)
+
+if __name__ == '__main__':
+    with open('xo.html','r') as f:
+        soup = BeautifulSoup(f.read(),'html.parser')
+        divs = soup.findAll('div', {"class": "WJTO WESO"})
+        ids = []
+        for div in divs:
+            selector = div['data-automation-id']
+            parts = selector.split('_')
+            ids.append(parts[-1])
+            #print(parts[-1])
+        print(ids)
+        print(len(ids))

@@ -1,0 +1,8 @@
+3
+IGVN-9YQ:Slack:E2,P7,C7
+M6,M7,K8,I7;FWT-7GX;Keystone
+L4,L4,J3,m5,N1;OBO-TZX;Slack
+Spotify -- 7G12L0:H8,B4,h5,C7,J6
+Qualcomm -- RF89LC:O6,C7,C2,D8
+Slack -- OBO-TZX:O6,C7,C2,D8,L4
+L96TMJ:Google:O5,J8,L5,B2
